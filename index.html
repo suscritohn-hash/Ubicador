@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Ubicador de Almacén</title>
+<style>
+:root{--bg:#f6f7f8;--card:#fff;--tx:#14181b;--mut:#66727c;--ac:#0f766e;--acx:#fff;--bd:#e1e5e8;--warn:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101315;--card:#1a1f22;--tx:#eceff1;--mut:#93a0a8;--ac:#2dd4bf;--acx:#06201c;--bd:#2a3237;--warn:#fbbf24}}
+:root[data-theme="dark"]{--bg:#101315;--card:#1a1f22;--tx:#eceff1;--mut:#93a0a8;--ac:#2dd4bf;--acx:#06201c;--bd:#2a3237;--warn:#fbbf24}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding-bottom:72px}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:12px 14px 8px;z-index:5}
+h1{font-size:18px;margin:0 0 8px}
+input,select,button{font:inherit;color:inherit}
+input[type=search],input[type=text],input[type=number],select{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+.row{display:flex;gap:8px}
+main{padding:0 14px 14px;max-width:640px;margin:auto}
+.item{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:8px 0;display:flex;gap:10px;align-items:center}
+.item .t{flex:1;min-width:0}
+.item b{display:block;overflow:hidden;text-overflow:ellipsis}
+.item small{color:var(--mut)}
+.loc{background:var(--ac);color:var(--acx);border-radius:8px;padding:6px 10px;font-weight:700;max-width:46%;font-size:13px;text-align:center;overflow-wrap:anywhere}
+.loc.none{background:transparent;color:var(--warn);border:1px dashed var(--warn)}
+.btn{background:var(--ac);color:var(--acx);border:0;border-radius:10px;padding:12px 14px;font-weight:600;width:100%;margin:6px 0;cursor:pointer}
+.btn.sec{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:10px 0}
+.card h2{font-size:15px;margin:0 0 6px}
+.card p{margin:4px 0;color:var(--mut);font-size:14px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;border:0;padding:12px 4px;color:var(--mut);font-size:13px;cursor:pointer}
+nav button.on{color:var(--ac);font-weight:700}
+.sheet{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;z-index:20}
+.sheet.show{display:flex}
+.sheet>div{background:var(--card);width:100%;max-width:640px;margin:auto auto 0;border-radius:16px 16px 0 0;padding:16px;display:grid;gap:8px;max-height:92vh;overflow:auto}
+.btn.del{background:transparent;color:#dc2626;border:1px solid #dc2626}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.kv span{color:var(--mut)}.kv b{text-align:right;overflow-wrap:anywhere}
+label{font-size:13px;color:var(--mut)}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:9px 14px;border-radius:20px;font-size:14px;display:none;z-index:30;max-width:90%}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+.v{display:none}.v.on{display:block}
+</style>
+</head>
+<body>
+<header>
+  <h1>📦 Ubicador de Almacén</h1>
+  <div id="hs">
+    <input type="search" id="q" placeholder="Buscar producto, código o ubicación…" autocomplete="off">
+    <div class="row" style="margin-top:8px"><select id="fw"></select></div>
+  </div>
+</header>
+<main>
+  <section id="v-find" class="v on"><button class="btn" id="add">＋ Agregar producto</button><div id="list"></div></section>
+
+  <section id="v-wh" class="v">
+    <button class="btn" id="addw">＋ Agregar bodega</button>
+    <p style="color:var(--mut);font-size:13px">Toca un almacén para renombrarlo o eliminarlo.</p>
+    <div id="whlist"></div>
+  </section>
+
+  <section id="v-imp" class="v">
+    <div class="card"><h2>1. Importar almacenes</h2>
+      <p>Excel (.xlsx) o .csv. Columnas: <b>codigo</b>, <b>nombre</b>.</p>
+      <button class="btn" data-f="wh">Elegir archivo de almacenes</button></div>
+    <div class="card"><h2>2. Importar productos</h2>
+      <p>Reconoce: <b>Producto</b>, <b>Código</b>, <b>Descripción</b>, <b>Bodega</b>, <b>Nivel 1/2/3</b>, <b>Precio unitario</b> y <b>Cantidad</b>. Si una fila no trae código, se genera uno automático (P0001, P0002…).</p>
+      <button class="btn" data-f="pr">Elegir archivo de productos</button></div>
+    <div class="card"><h2>Datos</h2>
+      <p id="stat"></p>
+      <button class="btn" id="exp">Exportar a Excel (.xlsx)</button>
+      <button class="btn sec" id="expc">Exportar a CSV</button>
+      <button class="btn sec" id="demo">Cargar datos de ejemplo</button>
+      <button class="btn sec" id="clr">Borrar todo</button>
+      <button class="btn sec" id="thm">Cambiar tema claro/oscuro</button></div>
+    <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
+  </section>
+</main>
+
+<nav>
+  <button data-v="find" class="on">🔍<br>Buscar</button>
+  <button data-v="wh">🏭<br>Bodegas</button>
+  <button data-v="imp">⬆️<br>Importar</button>
+</nav>
+
+<div class="sheet" id="sh"><div>
+  <b id="shT"></b>
+  <label>Código</label>
+  <input type="text" id="shC" autocapitalize="characters">
+  <label>Nombre</label>
+  <input type="text" id="shN">
+  <label>Descripción</label>
+  <input type="text" id="shD">
+  <label>Precio unitario</label>
+  <input type="number" id="shP" inputmode="decimal" step="any">
+  <label>Bodega</label>
+  <select id="shW"></select>
+  <div class="row"><div style="flex:1"><label>Rack</label><input type="text" id="shR"></div><div style="flex:1"><label>Nivel</label><input type="text" id="shV"></div></div>
+  <label>Caja</label>
+  <input type="text" id="shX">
+  <label>Otra ubicación / código</label>
+  <input type="text" id="shL" placeholder="Ej: 361" autocapitalize="characters">
+  <label>Cantidad</label>
+  <input type="number" id="shQ" inputmode="numeric">
+  <button class="btn" id="shOk">Guardar</button>
+  <button class="btn sec" id="shNo">Cancelar</button>
+  <button class="btn del" id="shDel">Eliminar producto</button>
+</div></div>
+<div class="sheet" id="pv"><div>
+  <b id="pvT" style="font-size:18px"></b>
+  <div id="pvB"></div>
+  <button class="btn" id="pvE">✏️ Editar</button>
+  <button class="btn del" id="pvD">🗑 Eliminar</button>
+  <button class="btn sec" id="pvC">Cerrar</button>
+</div></div>
+<div id="toast"></div>
+
+<script>
+const K="ubicador.v1",$=s=>document.querySelector(s);
+let S={wh:[],pr:[]},shown=60,cur=null,pend=null;
+try{const r=localStorage.getItem(K);if(r)S=JSON.parse(r)}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast("No se pudo guardar")}};
+const norm=s=>String(s==null?"":s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function parseLoc(p,parts){
+  const rest=[];
+  parts.forEach(v=>{v=String(v||"").trim();if(!v)return;
+    const m=/^(caja|rack|nivel)\s*:\s*(.*)$/i.exec(v);
+    if(m)p[m[1].toLowerCase()]=m[2].trim();else rest.push(v)});
+  p.loc=rest.join(" / ");
+}
+function locStr(p){return [p.loc,p.caja&&"Caja "+p.caja,p.rack&&"Rack "+p.rack,p.nivel&&"Nivel "+p.nivel].filter(Boolean).join(" · ")}
+function migrate(){let c=0;S.pr.forEach(p=>{if(p.m2)return;p.m2=1;if(p.loc&&/(caja|rack|nivel)\s*:/i.test(p.loc)){parseLoc(p,p.loc.split(" / "));c++}});if(c)save()}
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",2600)}
+
+/* ---------- vistas ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll(".v").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));
+  $("#hs").style.display=b.dataset.v==="find"?"block":"none";
+  render();
+});
+
+/* ---------- render ---------- */
+function whName(id){const w=S.wh.find(x=>x.id===id);return w?w.name:(id||"Sin almacén")}
+function render(){
+  const fw=$("#fw"),prev=fw.value;
+  fw.innerHTML='<option value="">Todas las bodegas</option>'+S.wh.map(w=>`<option value="${esc(w.id)}">${esc(w.name)}</option>`).join("");
+  fw.value=prev;
+  const q=norm($("#q").value),w=fw.value;
+  const res=S.pr.filter(p=>(!w||p.wh===w)&&(!q||norm(p.code+" "+p.name+" "+locStr(p)+" "+(p.desc||"")).includes(q)));
+  let h="";
+  if(!S.pr.length)h='<div class="empty">Aún no hay productos.<br>Ve a <b>Importar</b> para cargar tus archivos Excel.</div>';
+  else if(!res.length)h='<div class="empty">Sin resultados</div>';
+  else{
+    h=res.slice(0,shown).map(p=>`<div class="item" data-k="${esc(p.code+"|"+p.wh)}">
+      <div class="t"><b>${esc(p.name)}</b><small>${esc(p.code)} · ${esc(whName(p.wh))} · Cant: ${esc(p.qty)}${p.price?" · L "+esc(p.price):""}</small>${p.desc?`<small style="display:block">${esc(p.desc)}</small>`:""}</div>
+      <div class="loc ${locStr(p)?"":"none"}">${locStr(p)?esc(locStr(p)):"Asignar"}</div></div>`).join("");
+    if(res.length>shown)h+=`<button class="btn sec" id="more">Mostrar más (${res.length-shown})</button>`;
+  }
+  $("#list").innerHTML=h;
+  $("#whlist").innerHTML=S.wh.length?S.wh.map(x=>{const n=S.pr.filter(p=>p.wh===x.id).length;
+    return `<div class="item" data-w="${esc(x.id)}"><div class="t"><b>${esc(x.name)}</b><small>${esc(x.id)}</small></div><div class="loc">${n}</div></div>`}).join(""):'<div class="empty">Sin almacenes. Impórtalos desde la pestaña Importar.</div>';
+  $("#stat").textContent=S.wh.length+" almacenes · "+S.pr.length+" productos";
+}
+$("#q").oninput=()=>{shown=60;render()};
+$("#fw").onchange=()=>{shown=60;render()};
+$("#list").onclick=e=>{
+  if(e.target.id==="more"){shown+=60;render();return}
+  const it=e.target.closest(".item");if(!it)return;
+  const [c,w]=it.dataset.k.split("|");const p=S.pr.find(p=>p.code===c&&p.wh===w);if(p)openPv(p);
+};
+function openSheet(p){
+  cur=p||null;
+  $("#shT").textContent=p?"Editar producto":"Nuevo producto";
+  $("#shW").innerHTML='<option value="">Sin almacén</option>'+S.wh.map(w=>`<option value="${esc(w.id)}">${esc(w.name)}</option>`).join("");
+  $("#shC").value=p?p.code:"";$("#shN").value=p?p.name:"";$("#shW").value=p?p.wh:$("#fw").value;
+  $("#shL").value=p?p.loc:"";$("#shR").value=p?p.rack||"":"";$("#shV").value=p?p.nivel||"":"";$("#shX").value=p?p.caja||"":"";$("#shQ").value=p?p.qty:"";$("#shD").value=p?p.desc||"":"";$("#shP").value=p?p.price||"":"";
+  $("#shDel").style.display=p?"block":"none";
+  $("#sh").classList.add("show");
+}
+$("#add").onclick=()=>openSheet(null);
+function openPv(p){
+  cur=p;$("#pvT").textContent=p.name;
+  const rows=[["Código",p.code],["Bodega",whName(p.wh)],["Rack",p.rack||"—"],["Nivel",p.nivel||"—"],["Caja",p.caja||"—"],["Otra ubicación",p.loc||"—"],["Cantidad",p.qty],["Precio unitario",p.price?"L "+p.price:"—"],["Descripción",p.desc||"—"]];
+  $("#pvB").innerHTML=rows.map(r=>`<div class="kv"><span>${r[0]}</span><b>${esc(r[1])}</b></div>`).join("");
+  $("#pv").classList.add("show");
+}
+$("#pvC").onclick=()=>$("#pv").classList.remove("show");
+$("#pv").onclick=e=>{if(e.target.id==="pv")$("#pv").classList.remove("show")};
+$("#pvE").onclick=()=>{$("#pv").classList.remove("show");openSheet(cur)};
+$("#pvD").onclick=()=>{if(cur&&confirm("¿Eliminar este producto?")){S.pr=S.pr.filter(p=>p!==cur);save();$("#pv").classList.remove("show");render();toast("Eliminado")}};
+$("#shNo").onclick=()=>$("#sh").classList.remove("show");
+$("#shOk").onclick=()=>{
+  const code=$("#shC").value.trim(),wh=$("#shW").value;
+  if(!code)return toast("Falta el código");
+  if(S.pr.some(p=>p!==cur&&p.code===code&&p.wh===wh))return toast("Ese código ya existe en ese almacén");
+  const d={code,name:$("#shN").value.trim()||code,wh,loc:$("#shL").value.trim(),rack:$("#shR").value.trim(),nivel:$("#shV").value.trim(),caja:$("#shX").value.trim(),m2:1,qty:$("#shQ").value||"0",desc:$("#shD").value.trim(),price:$("#shP").value};
+  if(cur)Object.assign(cur,d);else S.pr.unshift(d);
+  save();$("#sh").classList.remove("show");render();toast("Guardado");
+};
+$("#shDel").onclick=()=>{if(cur&&confirm("¿Eliminar este producto?")){S.pr=S.pr.filter(p=>p!==cur);save();$("#sh").classList.remove("show");render();toast("Eliminado")}};
+$("#addw").onclick=()=>{
+  const id=(prompt("Código del almacén:")||"").trim();if(!id)return;
+  if(S.wh.some(w=>w.id===id))return toast("Ese código ya existe");
+  const nm=(prompt("Nombre del almacén:",id)||"").trim()||id;
+  S.wh.push({id,name:nm});save();render();
+};
+$("#whlist").onclick=e=>{
+  const it=e.target.closest("[data-w]");if(!it)return;
+  const w=S.wh.find(x=>x.id===it.dataset.w);if(!w)return;
+  const n=prompt("Nombre del almacén (vacío = eliminar):",w.name);if(n===null)return;
+  if(n.trim())w.name=n.trim();
+  else if(confirm("¿Eliminar este almacén? Sus productos quedarán sin almacén.")){S.wh=S.wh.filter(x=>x!==w);S.pr.forEach(p=>{if(p.wh===w.id)p.wh=""})}
+  save();render();
+};
+
+/* ---------- importación ---------- */
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{pend=b.dataset.f;$("#file").value="";$("#file").click()});
+$("#file").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const rows=await readRows(f);
+    if(!rows.length)return toast("El archivo está vacío");
+    pend==="wh"?impWh(rows):impPr(rows);
+    save();render();
+  }catch(err){toast("Error: "+(err.message||err))}
+};
+function csv(t){
+  const sep=(t.split("\n")[0].match(/;/g)||[]).length>(t.split("\n")[0].match(/,/g)||[]).length?";":",";
+  const out=[];let r=[],c="",q=false;
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){if(ch=='"'){if(t[i+1]=='"'){c+='"';i++}else q=false}else c+=ch}
+    else if(ch=='"')q=true;else if(ch===sep){r.push(c);c=""}
+    else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;r.push(c);c="";if(r.some(x=>x!==""))out.push(r);r=[]}
+    else c+=ch}
+  r.push(c);if(r.some(x=>x!==""))out.push(r);
+  const h=out.shift()||[];return out.map(v=>Object.fromEntries(h.map((k,i)=>[k,v[i]])));
+}
+function loadXlsx(){return new Promise((ok,ko)=>{
+  if(window.XLSX)return ok();
+  toast("Cargando lector de Excel…");
+  const s=document.createElement("script");
+  s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+  s.onload=ok;s.onerror=()=>ko("No se pudo cargar el lector de Excel (¿sin internet?). Usa .csv");
+  document.head.appendChild(s)})}
+async function readRows(f){
+  if(/\.csv$/i.test(f.name))return csv((await f.text()).replace(/^\ufeff/,""));
+  await loadXlsx();
+  const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
+  return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
+}
+function get(r,names){for(const k in r){if(names.includes(norm(k)))return String(r[k]==null?"":r[k]).trim()}return ""}
+const N={code:["codigo","code","sku","ref","referencia","id","cod"],name:["producto","nombre","articulo","name"],desc:["descripcion","description","detalle"],l1:["nivel 1","nivel1"],l2:["nivel 2","nivel2"],l3:["nivel 3","nivel3"],price:["precio unitario","precio","precio unit","costo","price"],
+  wh:["almacen","bodega","deposito","warehouse"],loc:["ubicacion","posicion","estante","pasillo","location"],rack:["rack"],nivel:["nivel"],caja:["caja"],qty:["cantidad","stock","existencia","existencias","qty","saldo"]};
+function impWh(rows){
+  let n=0;
+  rows.forEach(r=>{
+    const id=get(r,N.code),nm=get(r,N.name)||id;if(!id&&!nm)return;
+    const k=id||nm,x=S.wh.find(w=>w.id===k);
+    if(x)x.name=nm;else S.wh.push({id:k,name:nm});n++;
+  });
+  toast(n+" almacenes procesados");
+}
+function nextCode(){let m=0;S.pr.forEach(p=>{const t=/^P(\d+)$/.exec(p.code);if(t)m=Math.max(m,+t[1])});return "P"+String(m+1).padStart(4,"0")}
+function impPr(rows){
+  let a=0,u=0;
+  rows.forEach(r=>{
+    const name0=get(r,N.name);let code=get(r,N.code);if(!code&&!name0)return;
+    let wh=get(r,N.wh);
+    if(wh){const m=S.wh.find(w=>w.id===wh||norm(w.name)===norm(wh));
+      if(m)wh=m.id;else S.wh.push({id:wh,name:wh})}
+    const name=name0||code,L={rack:get(r,N.rack),nivel:get(r,N.nivel),caja:get(r,N.caja)},qty=get(r,N.qty),desc=get(r,N.desc);
+    parseLoc(L,[get(r,N.loc),get(r,N.l1),get(r,N.l2),get(r,N.l3)]);const pr0=get(r,N.price),price=pr0&&!isNaN(pr0)?(+pr0).toFixed(2):pr0;
+    const x=S.pr.find(p=>(code?p.code===code:norm(p.name)===norm(name))&&p.wh===wh);
+    if(x){x.name=name;["loc","rack","nivel","caja"].forEach(k=>{if(L[k])x[k]=L[k]});if(qty!=="")x.qty=qty;if(desc)x.desc=desc;if(price)x.price=price;u++}
+    else{if(!code)code=nextCode();S.pr.push({code,name,wh,loc:L.loc||"",rack:L.rack||"",nivel:L.nivel||"",caja:L.caja||"",m2:1,qty:qty||"0",desc,price});a++}
+  });
+  toast(a+" nuevos, "+u+" actualizados");
+}
+
+/* ---------- utilidades ---------- */
+$("#exp").onclick=async()=>{
+  if(!S.pr.length)return toast("No hay productos");
+  try{
+    await loadXlsx();
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.pr.map(p=>({"Producto":p.name,"Código":p.code,"Descripción":p.desc||"","Bodega":whName(p.wh),"Ubicación":p.loc||"","Rack":p.rack||"","Nivel":p.nivel||"","Caja":p.caja||"","Cantidad":p.qty!==""&&!isNaN(p.qty)?Number(p.qty):p.qty,"Precio unitario":p.price&&!isNaN(p.price)?Number(p.price):(p.price||"")}))),"Productos");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.wh.map(w=>({codigo:w.id,nombre:w.name}))),"Almacenes");
+    XLSX.writeFile(wb,"ubicaciones_almacen.xlsx");toast("Excel exportado");
+  }catch(e){toast("Sin internet: se exporta CSV");$("#expc").click()}
+};
+$("#expc").onclick=()=>{
+  const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
+  const t=["Producto,Código,Descripción,Bodega,Ubicación,Rack,Nivel,Caja,Cantidad,Precio unitario"].concat(S.pr.map(p=>[p.name,p.code,p.desc||"",whName(p.wh),p.loc||"",p.rack||"",p.nivel||"",p.caja||"",p.qty,p.price||""].map(q).join(","))).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv"}));a.download="productos.csv";a.click();
+};
+$("#demo").onclick=()=>{
+  S={wh:[{id:"AL1",name:"Almacén Central"},{id:"AL2",name:"Bodega Norte"}],pr:[
+   {code:"P001",name:"Tornillo 1/4 x 2",wh:"AL1",loc:"A-01-1",qty:"500"},
+   {code:"P002",name:"Tuerca hexagonal 1/4",wh:"AL1",loc:"A-01-2",qty:"800"},
+   {code:"P003",name:"Cable eléctrico 12 AWG",wh:"AL2",loc:"B-04-3",qty:"120"},
+   {code:"P004",name:"Cinta aislante negra",wh:"AL2",loc:"",qty:"60"},
+   {code:"P005",name:"Taladro inalámbrico",wh:"AL1",loc:"C-02-1",qty:"8"}]};
+  save();render();toast("Datos de ejemplo cargados");
+};
+$("#clr").onclick=()=>{if(confirm("¿Borrar todos los almacenes y productos?")){S={wh:[],pr:[]};save();render()}};
+$("#thm").onclick=()=>{
+  const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue("--bg").trim()==="#101315";
+  d.dataset.theme=dark?"light":"dark";
+};
+migrate();render();
+if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
+</script>
+</body>
+</html>
