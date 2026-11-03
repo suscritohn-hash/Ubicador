@@ -4,10 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f766e">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="mobile-web-app-capable" content="yes">
 <title>Ubicador de Almacén</title>
 <style>
 :root{--bg:#f6f7f8;--card:#fff;--tx:#14181b;--mut:#66727c;--ac:#0f766e;--acx:#fff;--bd:#e1e5e8;--warn:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -46,11 +42,91 @@ label{font-size:13px;color:var(--mut)}
 #toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:9px 14px;border-radius:20px;font-size:14px;display:none;z-index:30;max-width:90%}
 .empty{text-align:center;color:var(--mut);padding:30px 10px}
 .v{display:none}.v.on{display:block}
+html{font-size:var(--fs,22px)}
+body{font-size:1rem;padding-bottom:120px}
+h1{font-size:1.25rem}
+input[type=search],input[type=text],input[type=number],input[type=password],select{font-size:1rem;padding:14px;min-height:56px;border-width:2px}
+.up{text-transform:capitalize}
+.item{padding:16px}
+.item b{font-size:1.05rem;overflow:visible;white-space:normal;text-overflow:clip}
+.item small{font-size:.85rem;display:block}
+.loc{font-size:.85rem;padding:8px 12px;max-width:50%}
+.btn{font-size:1rem;padding:16px;min-height:58px}
+.card h2{font-size:1.1rem}.card p{font-size:.9rem}
+nav button{font-size:.8rem;padding:10px 2px}
+label{font-size:.85rem;font-weight:600;color:var(--tx)}
+#toast{font-size:.9rem;bottom:120px}
+#lock{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+#lock>div{width:100%;max-width:420px;display:grid;gap:12px}
+.chk{display:flex;gap:12px;align-items:center}.chk input{width:30px;height:30px}
+#pwE{color:#dc2626;margin:0;min-height:1.2em}
+
+/* ---- inicio de sesión moderno, cámara lenta ---- */
+#lock{background:#04201d;overflow:hidden;color:#fff}
+#lock .bl{position:absolute;border-radius:50%;filter:blur(64px);opacity:.6;animation:drift 24s ease-in-out infinite alternate}
+#lock .b1{width:70vmax;height:70vmax;left:-25vmax;top:-22vmax;background:#0f766e}
+#lock .b2{width:60vmax;height:60vmax;right:-22vmax;bottom:-22vmax;background:#2563eb;animation-duration:30s;animation-delay:-9s}
+#lock .b3{width:44vmax;height:44vmax;left:28%;top:38%;background:#14b8a6;opacity:.35;animation-duration:36s;animation-delay:-16s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(8vmax,6vmax) scale(1.18)}100%{transform:translate(-6vmax,10vmax) scale(.94)}}
+#lock>.lk-card{position:relative;width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;gap:12px;padding:26px 20px 20px;border-radius:34px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:0 30px 80px rgba(0,0,0,.5);animation:rise 2s cubic-bezier(.16,1,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(70px) scale(.93)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.lk-card>*{animation:fadeUp 1.6s cubic-bezier(.16,1,.3,1) both}
+.lk-card>:nth-child(2){animation-delay:.3s}.lk-card>:nth-child(3){animation-delay:.45s}.lk-card>:nth-child(4){animation-delay:.6s}.lk-card>:nth-child(5){animation-delay:.75s}.lk-card>:nth-child(6){animation-delay:.9s}.lk-card>:nth-child(7){animation-delay:1.05s}
+.lk-logo{width:88px;height:88px;border-radius:28px;display:grid;place-items:center;font-size:46px;background:linear-gradient(135deg,#2dd4bf,#0f766e);animation:fadeUp 1.6s cubic-bezier(.16,1,.3,1) both,float 7s ease-in-out 1.6s infinite,ring 4.5s ease-out 1.6s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(45,212,191,.5)}100%{box-shadow:0 0 0 30px rgba(45,212,191,0)}}
+#lock h1{font-size:1.5rem;margin:0}
+.lk-s{margin:0;color:#a7f3d0;font-size:.85rem}
+.dots{display:flex;gap:20px;margin:4px 0}
+.dots i{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.7);transition:all .6s cubic-bezier(.2,.8,.2,1)}
+.dots i.on{background:#5eead4;border-color:#5eead4;transform:scale(1.25);box-shadow:0 0 20px #2dd4bf}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.pad button{width:min(76px,10vh);height:min(76px,10vh);justify-self:center;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);color:#fff;font-size:1.3rem;font-weight:600;cursor:pointer;transition:transform .6s cubic-bezier(.2,.8,.2,1),background .8s}
+.pad button:active{transform:scale(.86);background:rgba(94,234,212,.5);transition-duration:.12s}
+#lock .chk{color:#d1fae5;font-size:.8rem}
+#lock #pwE{color:#fecaca;min-height:1.2em;margin:0;font-size:.85rem}
+#lock>.lk-card.bad{animation:shake 1.1s ease-in-out}
+#lock>.lk-card.ok{animation:okOut .9s ease-in .55s forwards}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-20px)}30%{transform:translateX(16px)}45%{transform:translateX(-11px)}60%{transform:translateX(7px)}80%{transform:translateX(-3px)}}
+@keyframes okOut{to{opacity:0;transform:scale(1.08) translateY(-24px);filter:blur(8px)}}
+#lock{-webkit-user-select:none;user-select:none}
+.lk-card>:nth-child(8){animation-delay:1.2s}.lk-card>:nth-child(9){animation-delay:1.35s}.lk-card>:nth-child(10){animation-delay:1.5s}
+#lock select{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);text-align:center;text-align-last:center;border-radius:16px;min-height:52px;width:100%;font-size:1rem}
+#lock select option{color:#000}
+.brand{text-align:center;color:var(--mut);font-size:.8rem;margin:14px 0}
+/* ---- animación creativa: almacén en cámara lenta ---- */
+.gridf{position:absolute;left:-60%;right:-60%;bottom:-8%;height:55%;background:linear-gradient(rgba(94,234,212,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(94,234,212,.2) 1px,transparent 1px);background-size:52px 52px;transform:perspective(380px) rotateX(64deg);transform-origin:bottom;animation:gridmove 10s linear infinite;-webkit-mask-image:linear-gradient(transparent,#000 65%);mask-image:linear-gradient(transparent,#000 65%)}
+@keyframes gridmove{to{background-position:0 52px}}
+.fb{position:absolute;bottom:-70px;left:var(--x);width:var(--s);height:var(--s);border:2px solid rgba(204,251,241,.35);background:rgba(94,234,212,.08);border-radius:5px;animation:floatUp var(--t) linear var(--d) infinite}
+.fb::after{content:"";position:absolute;left:42%;width:16%;top:0;bottom:0;background:rgba(204,251,241,.3)}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:1}88%{opacity:.8}100%{transform:translateY(-115vh) rotate(200deg);opacity:0}}
+.lk-logo{background:none;font-size:0;width:96px;height:96px;border-radius:50%;perspective:520px}
+.cube{width:58px;height:58px;position:relative;transform-style:preserve-3d;animation:spin 16s linear infinite}
+.cube i{position:absolute;inset:0;border-radius:8px;border:2px solid rgba(255,255,255,.6);background:linear-gradient(135deg,rgba(45,212,191,.9),rgba(15,118,110,.95));box-shadow:inset 0 0 14px rgba(255,255,255,.3)}
+.cube i::after{content:"";position:absolute;left:41%;width:18%;top:0;bottom:0;background:rgba(255,255,255,.4)}
+.cube .f1{transform:translateZ(29px)}.cube .f2{transform:rotateY(90deg) translateZ(29px)}.cube .f3{transform:rotateY(180deg) translateZ(29px)}.cube .f4{transform:rotateY(-90deg) translateZ(29px)}.cube .f5{transform:rotateX(90deg) translateZ(29px)}.cube .f6{transform:rotateX(-90deg) translateZ(29px)}
+@keyframes spin{from{transform:rotateX(-24deg) rotateY(0)}to{transform:rotateX(-24deg) rotateY(360deg)}}
+@keyframes spinFast{from{transform:rotateX(-24deg) rotateY(0) scale(1)}to{transform:rotateX(-24deg) rotateY(720deg) scale(2)}}
+#lock>.lk-card.ok .cube{animation:spinFast 1.3s ease-in forwards}
+#lock h1{background:linear-gradient(90deg,#fff 30%,#5eead4 50%,#fff 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:shimmer 6s linear infinite}
+@keyframes shimmer{from{background-position:150% 0}to{background-position:-150% 0}}
+.bar{position:relative;width:150px;height:22px;overflow:hidden;opacity:.8;background:repeating-linear-gradient(90deg,#ccfbf1 0 2px,transparent 2px 5px,#ccfbf1 5px 6px,transparent 6px 10px,#ccfbf1 10px 13px,transparent 13px 15px)}
+.bar::after{content:"";position:absolute;top:0;bottom:0;width:3px;background:#f87171;box-shadow:0 0 12px 2px #f87171;animation:sweep 3.8s ease-in-out infinite alternate}
+@keyframes sweep{from{left:0}to{left:calc(100% - 3px)}}
+.pad button{position:relative}
+.pad button.rp::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid #5eead4;animation:rp 1.1s ease-out forwards;pointer-events:none}
+@keyframes rp{from{transform:scale(1);opacity:.95}to{transform:scale(1.8);opacity:0}}
+#lock>.lk-card::after{content:"";position:absolute;left:10px;right:10px;top:0;height:3px;border-radius:3px;opacity:0;pointer-events:none;background:linear-gradient(90deg,transparent,#5eead4,transparent);box-shadow:0 0 22px 5px rgba(45,212,191,.85)}
+#lock>.lk-card.ok::after{animation:scanDown .9s ease-in-out forwards}
+#lock>.lk-card.bad::after{background:linear-gradient(90deg,transparent,#f87171,transparent);box-shadow:0 0 22px 5px rgba(248,113,113,.85);animation:scanDown .8s ease-in-out forwards}
+#lock>.lk-card.bad{box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 44px rgba(248,113,113,.5)}
+@keyframes scanDown{0%{top:0;opacity:1}100%{top:calc(100% - 3px);opacity:1}}
 </style>
 </head>
 <body>
 <header>
-  <h1>📦 Ubicador de Almacén</h1>
+  <div class="row" style="align-items:center;justify-content:space-between;margin-bottom:8px"><h1 style="margin:0">📦 Ubicador</h1><div class="row" style="flex:none"><button class="btn sec" id="lk" style="width:auto;margin:0;min-height:50px;padding:8px 14px" aria-label="Bloquear pantalla">🔒</button><button class="btn sec fsb" style="width:auto;margin:0;min-height:50px;padding:8px 16px" aria-label="Tamaño de letra">A+</button></div></div>
   <div id="hs">
     <input type="search" id="q" placeholder="Buscar producto, código o ubicación…" autocomplete="off">
     <div class="row" style="margin-top:8px"><select id="fw"></select></div>
@@ -59,11 +135,9 @@ label{font-size:13px;color:var(--mut)}
 <main>
   <section id="v-find" class="v on"><button class="btn" id="add">＋ Agregar producto</button><div id="list"></div></section>
 
-  <section id="v-wh" class="v">
-    <button class="btn" id="addw">＋ Agregar bodega</button>
-    <p style="color:var(--mut);font-size:13px">Toca un almacén para renombrarlo o eliminarlo.</p>
-    <div id="whlist"></div>
-  </section>
+  <section id="v-wh" class="v"><div id="lists"></div></section>
+
+  <section id="v-usr" class="v"><div id="ulist"></div></section>
 
   <section id="v-imp" class="v">
     <div class="card"><h2>1. Importar almacenes</h2>
@@ -75,17 +149,22 @@ label{font-size:13px;color:var(--mut)}
     <div class="card"><h2>Datos</h2>
       <p id="stat"></p>
       <button class="btn" id="exp">Exportar a Excel (.xlsx)</button>
+      <button class="btn" id="expx">Exportar a Excel 97-2003 (.xls)</button>
       <button class="btn sec" id="expc">Exportar a CSV</button>
       <button class="btn sec" id="demo">Cargar datos de ejemplo</button>
       <button class="btn sec" id="clr">Borrar todo</button>
-      <button class="btn sec" id="thm">Cambiar tema claro/oscuro</button></div>
+      <button class="btn sec fsb" id="fsb">Tamaño de letra</button>
+      <button class="btn sec" id="thm">Cambiar tema claro/oscuro</button>
+      <button class="btn sec" id="out">Cerrar sesión</button></div>
+    <p class="brand">Ubicador · Made by Victor Aguilar</p>
     <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
   </section>
 </main>
 
 <nav>
   <button data-v="find" class="on">🔍<br>Buscar</button>
-  <button data-v="wh">🏭<br>Bodegas</button>
+  <button data-v="wh">🗂<br>Listas</button>
+  <button data-v="usr">👤<br>Usuarios</button>
   <button data-v="imp">⬆️<br>Importar</button>
 </nav>
 
@@ -101,11 +180,17 @@ label{font-size:13px;color:var(--mut)}
   <input type="number" id="shP" inputmode="decimal" step="any">
   <label>Bodega</label>
   <select id="shW"></select>
-  <div class="row"><div style="flex:1"><label>Rack</label><input type="text" id="shR"></div><div style="flex:1"><label>Nivel</label><input type="text" id="shV"></div></div>
+  <label>Rack</label>
+  <input type="text" id="shR" class="up" list="dl-rack" autocapitalize="words">
+  <label>Nivel</label>
+  <input type="text" id="shV" class="up" list="dl-nivel" autocapitalize="words">
   <label>Caja</label>
-  <input type="text" id="shX">
+  <input type="text" id="shX" class="up" list="dl-caja" autocapitalize="words">
+  <label>Bolsa</label>
+  <input type="text" id="shB" class="up" list="dl-bolsa" autocapitalize="words">
+  <datalist id="dl-rack"></datalist><datalist id="dl-nivel"></datalist><datalist id="dl-caja"></datalist><datalist id="dl-bolsa"></datalist>
   <label>Otra ubicación / código</label>
-  <input type="text" id="shL" placeholder="Ej: 361" autocapitalize="characters">
+  <input type="text" id="shL" placeholder="Ej: 361" autocapitalize="words">
   <label>Cantidad</label>
   <input type="number" id="shQ" inputmode="numeric">
   <button class="btn" id="shOk">Guardar</button>
@@ -119,6 +204,45 @@ label{font-size:13px;color:var(--mut)}
   <button class="btn del" id="pvD">🗑 Eliminar</button>
   <button class="btn sec" id="pvC">Cerrar</button>
 </div></div>
+<div class="sheet" id="us"><div>
+  <b id="usT"></b>
+  <label>Usuario</label>
+  <input type="text" id="usN" autocapitalize="words" autocomplete="off">
+  <label>Contraseña (4 a 8 números)</label>
+  <input type="text" id="usP" inputmode="numeric" maxlength="8" autocomplete="off">
+  <label class="chk" id="usAL"><input type="checkbox" id="usA"> Administrador</label>
+  <button class="btn" id="usOk">Guardar</button>
+  <button class="btn sec" id="usNo">Cancelar</button>
+  <button class="btn del" id="usDel">Eliminar usuario</button>
+</div></div>
+<div class="sheet" id="ls"><div>
+  <b id="lsT"></b>
+  <input type="text" id="lsV" class="up" autocapitalize="words">
+  <button class="btn" id="lsOk">Guardar</button>
+  <button class="btn sec" id="lsNo">Cancelar</button>
+  <button class="btn del" id="lsDel">Eliminar</button>
+</div></div>
+<div id="lock">
+  <i class="bl b1"></i><i class="bl b2"></i><i class="bl b3"></i>
+  <div class="gridf"></div><b class="fb" style="--x:6%;--s:26px;--t:34s;--d:-3s"></b><b class="fb" style="--x:15%;--s:40px;--t:44s;--d:-18s"></b><b class="fb" style="--x:27%;--s:20px;--t:30s;--d:-9s"></b><b class="fb" style="--x:38%;--s:34px;--t:40s;--d:-25s"></b><b class="fb" style="--x:49%;--s:24px;--t:28s;--d:-14s"></b><b class="fb" style="--x:58%;--s:46px;--t:48s;--d:-2s"></b><b class="fb" style="--x:68%;--s:22px;--t:32s;--d:-21s"></b><b class="fb" style="--x:77%;--s:36px;--t:38s;--d:-11s"></b><b class="fb" style="--x:86%;--s:28px;--t:30s;--d:-29s"></b><b class="fb" style="--x:93%;--s:42px;--t:46s;--d:-6s"></b><b class="fb" style="--x:21%;--s:18px;--t:26s;--d:-16s"></b><b class="fb" style="--x:72%;--s:16px;--t:27s;--d:-5s"></b>
+  <div class="lk-card">
+    <div class="lk-logo"><div class="cube"><i class="f1"></i><i class="f2"></i><i class="f3"></i><i class="f4"></i><i class="f5"></i><i class="f6"></i></div></div>
+    <div style="text-align:center"><h1>Ubicador</h1><p class="lk-s" style="margin-top:2px">Made by Victor Aguilar</p></div>
+    <div class="bar"></div>
+    <select id="lu" aria-label="Usuario"></select>
+    <p class="lk-s">Ingresa tu contraseña</p>
+    <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+    <input type="password" id="pw" readonly tabindex="-1" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;min-height:0;padding:0;border:0">
+    <div class="pad">
+      <button data-n="1">1</button><button data-n="2">2</button><button data-n="3">3</button>
+      <button data-n="4">4</button><button data-n="5">5</button><button data-n="6">6</button>
+      <button data-n="7">7</button><button data-n="8">8</button><button data-n="9">9</button>
+      <button data-n="x" aria-label="Borrar">⌫</button><button data-n="0">0</button><button data-n="ok" id="pwOk" aria-label="Entrar">➜</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="rem" checked> Mantener sesión iniciada</label>
+    <p id="pwE"></p>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -128,14 +252,20 @@ try{const r=localStorage.getItem(K);if(r)S=JSON.parse(r)}catch(e){}
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast("No se pudo guardar")}};
 const norm=s=>String(s==null?"":s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const up=s=>String(s==null?"":s).trim().toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase());
+const TL={bodega:"Bodegas",rack:"Racks",nivel:"Niveles",caja:"Cajas",bolsa:"Bolsas"};
+function fixCat(){S.cat=S.cat||{};["rack","nivel","caja","bolsa"].forEach(t=>{if(!Array.isArray(S.cat[t]))S.cat[t]=[]})}
+function addCat(t,v){fixCat();v=up(v);if(v&&!S.cat[t].includes(v))S.cat[t].push(v)}
+function items(t){fixCat();return t==="bodega"?S.wh.map(w=>({k:w.id,n:w.name})):S.cat[t].map(v=>({k:v,n:v}))}
+function count(t,k){return S.pr.filter(p=>t==="bodega"?p.wh===k:p[t]===k).length}
 function parseLoc(p,parts){
   const rest=[];
   parts.forEach(v=>{v=String(v||"").trim();if(!v)return;
-    const m=/^(caja|rack|nivel)\s*:\s*(.*)$/i.exec(v);
-    if(m)p[m[1].toLowerCase()]=m[2].trim();else rest.push(v)});
+    const m=/^(caja|rack|nivel|bolsa)\s*:\s*(.*)$/i.exec(v);
+    if(m)p[m[1].toLowerCase()]=up(m[2]);else rest.push(up(v))});
   p.loc=rest.join(" / ");
 }
-function locStr(p){return [p.loc,p.caja&&"Caja "+p.caja,p.rack&&"Rack "+p.rack,p.nivel&&"Nivel "+p.nivel].filter(Boolean).join(" · ")}
+function locStr(p,w){return [w&&p.wh&&"Bodega "+whName(p.wh),p.rack&&"Rack "+p.rack,p.nivel&&"Nivel "+p.nivel,p.caja&&"Caja "+p.caja,p.bolsa&&"Bolsa "+p.bolsa,p.loc].filter(Boolean).join(" · ")}
 function migrate(){let c=0;S.pr.forEach(p=>{if(p.m2)return;p.m2=1;if(p.loc&&/(caja|rack|nivel)\s*:/i.test(p.loc)){parseLoc(p,p.loc.split(" / "));c++}});if(c)save()}
 function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",2600)}
 
@@ -150,6 +280,7 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
 /* ---------- render ---------- */
 function whName(id){const w=S.wh.find(x=>x.id===id);return w?w.name:(id||"Sin almacén")}
 function render(){
+  fixCat();
   const fw=$("#fw"),prev=fw.value;
   fw.innerHTML='<option value="">Todas las bodegas</option>'+S.wh.map(w=>`<option value="${esc(w.id)}">${esc(w.name)}</option>`).join("");
   fw.value=prev;
@@ -161,13 +292,14 @@ function render(){
   else{
     h=res.slice(0,shown).map(p=>`<div class="item" data-k="${esc(p.code+"|"+p.wh)}">
       <div class="t"><b>${esc(p.name)}</b><small>${esc(p.code)} · ${esc(whName(p.wh))} · Cant: ${esc(p.qty)}${p.price?" · L "+esc(p.price):""}</small>${p.desc?`<small style="display:block">${esc(p.desc)}</small>`:""}</div>
-      <div class="loc ${locStr(p)?"":"none"}">${locStr(p)?esc(locStr(p)):"Asignar"}</div></div>`).join("");
+      <div class="loc ${locStr(p)?"":"none"}">${locStr(p)?esc(locStr(p,1)):"Asignar"}</div></div>`).join("");
     if(res.length>shown)h+=`<button class="btn sec" id="more">Mostrar más (${res.length-shown})</button>`;
   }
   $("#list").innerHTML=h;
-  $("#whlist").innerHTML=S.wh.length?S.wh.map(x=>{const n=S.pr.filter(p=>p.wh===x.id).length;
-    return `<div class="item" data-w="${esc(x.id)}"><div class="t"><b>${esc(x.name)}</b><small>${esc(x.id)}</small></div><div class="loc">${n}</div></div>`}).join(""):'<div class="empty">Sin almacenes. Impórtalos desde la pestaña Importar.</div>';
-  $("#stat").textContent=S.wh.length+" almacenes · "+S.pr.length+" productos";
+  $("#lists").innerHTML=Object.keys(TL).map(t=>{const it=items(t);
+    return `<div class="card"><h2>${TL[t]} (${it.length})</h2><button class="btn" data-a="${t}">＋ Agregar</button>`+(it.length?it.map(x=>`<div class="item" data-t="${t}" data-k="${esc(x.k)}"><div class="t"><b>${esc(x.n)}</b></div><div class="loc">${count(t,x.k)}</div></div>`).join(""):'<p>Vacío</p>')+`</div>`}).join("");
+  $("#stat").textContent=S.wh.length+" bodegas · "+S.pr.length+" productos";
+  renderUsers();
 }
 $("#q").oninput=()=>{shown=60;render()};
 $("#fw").onchange=()=>{shown=60;render()};
@@ -181,14 +313,14 @@ function openSheet(p){
   $("#shT").textContent=p?"Editar producto":"Nuevo producto";
   $("#shW").innerHTML='<option value="">Sin almacén</option>'+S.wh.map(w=>`<option value="${esc(w.id)}">${esc(w.name)}</option>`).join("");
   $("#shC").value=p?p.code:"";$("#shN").value=p?p.name:"";$("#shW").value=p?p.wh:$("#fw").value;
-  $("#shL").value=p?p.loc:"";$("#shR").value=p?p.rack||"":"";$("#shV").value=p?p.nivel||"":"";$("#shX").value=p?p.caja||"":"";$("#shQ").value=p?p.qty:"";$("#shD").value=p?p.desc||"":"";$("#shP").value=p?p.price||"":"";
+  $("#shL").value=p?p.loc:"";$("#shR").value=p?p.rack||"":"";$("#shV").value=p?p.nivel||"":"";$("#shX").value=p?p.caja||"":"";$("#shB").value=p?p.bolsa||"":"";["rack","nivel","caja","bolsa"].forEach(t=>{$("#dl-"+t).innerHTML=S.cat[t].map(v=>`<option value="${esc(v)}">`).join("")});$("#shQ").value=p?p.qty:"";$("#shD").value=p?p.desc||"":"";$("#shP").value=p?p.price||"":"";
   $("#shDel").style.display=p?"block":"none";
   $("#sh").classList.add("show");
 }
 $("#add").onclick=()=>openSheet(null);
 function openPv(p){
   cur=p;$("#pvT").textContent=p.name;
-  const rows=[["Código",p.code],["Bodega",whName(p.wh)],["Rack",p.rack||"—"],["Nivel",p.nivel||"—"],["Caja",p.caja||"—"],["Otra ubicación",p.loc||"—"],["Cantidad",p.qty],["Precio unitario",p.price?"L "+p.price:"—"],["Descripción",p.desc||"—"]];
+  const rows=[["Código",p.code],["Bodega",whName(p.wh)],["Rack",p.rack||"—"],["Nivel",p.nivel||"—"],["Caja",p.caja||"—"],["Bolsa",p.bolsa||"—"],["Otra ubicación",p.loc||"—"],["Cantidad",p.qty],["Precio unitario",p.price?"L "+p.price:"—"],["Descripción",p.desc||"—"]];
   $("#pvB").innerHTML=rows.map(r=>`<div class="kv"><span>${r[0]}</span><b>${esc(r[1])}</b></div>`).join("");
   $("#pv").classList.add("show");
 }
@@ -201,26 +333,12 @@ $("#shOk").onclick=()=>{
   const code=$("#shC").value.trim(),wh=$("#shW").value;
   if(!code)return toast("Falta el código");
   if(S.pr.some(p=>p!==cur&&p.code===code&&p.wh===wh))return toast("Ese código ya existe en ese almacén");
-  const d={code,name:$("#shN").value.trim()||code,wh,loc:$("#shL").value.trim(),rack:$("#shR").value.trim(),nivel:$("#shV").value.trim(),caja:$("#shX").value.trim(),m2:1,qty:$("#shQ").value||"0",desc:$("#shD").value.trim(),price:$("#shP").value};
+  const d={code,name:$("#shN").value.trim()||code,wh,loc:up($("#shL").value),rack:up($("#shR").value),nivel:up($("#shV").value),caja:up($("#shX").value),bolsa:up($("#shB").value),m2:1,qty:$("#shQ").value||"0",desc:$("#shD").value.trim(),price:$("#shP").value};
   if(cur)Object.assign(cur,d);else S.pr.unshift(d);
+  ["rack","nivel","caja","bolsa"].forEach(t=>addCat(t,d[t]));
   save();$("#sh").classList.remove("show");render();toast("Guardado");
 };
 $("#shDel").onclick=()=>{if(cur&&confirm("¿Eliminar este producto?")){S.pr=S.pr.filter(p=>p!==cur);save();$("#sh").classList.remove("show");render();toast("Eliminado")}};
-$("#addw").onclick=()=>{
-  const id=(prompt("Código del almacén:")||"").trim();if(!id)return;
-  if(S.wh.some(w=>w.id===id))return toast("Ese código ya existe");
-  const nm=(prompt("Nombre del almacén:",id)||"").trim()||id;
-  S.wh.push({id,name:nm});save();render();
-};
-$("#whlist").onclick=e=>{
-  const it=e.target.closest("[data-w]");if(!it)return;
-  const w=S.wh.find(x=>x.id===it.dataset.w);if(!w)return;
-  const n=prompt("Nombre del almacén (vacío = eliminar):",w.name);if(n===null)return;
-  if(n.trim())w.name=n.trim();
-  else if(confirm("¿Eliminar este almacén? Sus productos quedarán sin almacén.")){S.wh=S.wh.filter(x=>x!==w);S.pr.forEach(p=>{if(p.wh===w.id)p.wh=""})}
-  save();render();
-};
-
 /* ---------- importación ---------- */
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{pend=b.dataset.f;$("#file").value="";$("#file").click()});
 $("#file").onchange=async e=>{
@@ -258,11 +376,11 @@ async function readRows(f){
 }
 function get(r,names){for(const k in r){if(names.includes(norm(k)))return String(r[k]==null?"":r[k]).trim()}return ""}
 const N={code:["codigo","code","sku","ref","referencia","id","cod"],name:["producto","nombre","articulo","name"],desc:["descripcion","description","detalle"],l1:["nivel 1","nivel1"],l2:["nivel 2","nivel2"],l3:["nivel 3","nivel3"],price:["precio unitario","precio","precio unit","costo","price"],
-  wh:["almacen","bodega","deposito","warehouse"],loc:["ubicacion","posicion","estante","pasillo","location"],rack:["rack"],nivel:["nivel"],caja:["caja"],qty:["cantidad","stock","existencia","existencias","qty","saldo"]};
+  wh:["almacen","bodega","deposito","warehouse"],loc:["ubicacion","posicion","estante","pasillo","location"],rack:["rack"],nivel:["nivel"],caja:["caja"],bolsa:["bolsa"],qty:["cantidad","stock","existencia","existencias","qty","saldo"]};
 function impWh(rows){
   let n=0;
   rows.forEach(r=>{
-    const id=get(r,N.code),nm=get(r,N.name)||id;if(!id&&!nm)return;
+    const id=up(get(r,N.code)),nm=up(get(r,N.name))||id;if(!id&&!nm)return;
     const k=id||nm,x=S.wh.find(w=>w.id===k);
     if(x)x.name=nm;else S.wh.push({id:k,name:nm});n++;
   });
@@ -275,12 +393,12 @@ function impPr(rows){
     const name0=get(r,N.name);let code=get(r,N.code);if(!code&&!name0)return;
     let wh=get(r,N.wh);
     if(wh){const m=S.wh.find(w=>w.id===wh||norm(w.name)===norm(wh));
-      if(m)wh=m.id;else S.wh.push({id:wh,name:wh})}
-    const name=name0||code,L={rack:get(r,N.rack),nivel:get(r,N.nivel),caja:get(r,N.caja)},qty=get(r,N.qty),desc=get(r,N.desc);
-    parseLoc(L,[get(r,N.loc),get(r,N.l1),get(r,N.l2),get(r,N.l3)]);const pr0=get(r,N.price),price=pr0&&!isNaN(pr0)?(+pr0).toFixed(2):pr0;
+      if(m)wh=m.id;else{wh=up(wh);S.wh.push({id:wh,name:wh})}}
+    const name=name0||code,L={rack:get(r,N.rack),nivel:get(r,N.nivel),caja:get(r,N.caja),bolsa:get(r,N.bolsa)},qty=get(r,N.qty),desc=get(r,N.desc);
+    parseLoc(L,[get(r,N.loc),get(r,N.l1),get(r,N.l2),get(r,N.l3)]);["rack","nivel","caja","bolsa"].forEach(t=>{L[t]=up(L[t]);addCat(t,L[t])});const pr0=get(r,N.price),price=pr0&&!isNaN(pr0)?(+pr0).toFixed(2):pr0;
     const x=S.pr.find(p=>(code?p.code===code:norm(p.name)===norm(name))&&p.wh===wh);
-    if(x){x.name=name;["loc","rack","nivel","caja"].forEach(k=>{if(L[k])x[k]=L[k]});if(qty!=="")x.qty=qty;if(desc)x.desc=desc;if(price)x.price=price;u++}
-    else{if(!code)code=nextCode();S.pr.push({code,name,wh,loc:L.loc||"",rack:L.rack||"",nivel:L.nivel||"",caja:L.caja||"",m2:1,qty:qty||"0",desc,price});a++}
+    if(x){x.name=name;["loc","rack","nivel","caja","bolsa"].forEach(k=>{if(L[k])x[k]=L[k]});if(qty!=="")x.qty=qty;if(desc)x.desc=desc;if(price)x.price=price;u++}
+    else{if(!code)code=nextCode();S.pr.push({code,name,wh,loc:L.loc||"",rack:L.rack||"",nivel:L.nivel||"",caja:L.caja||"",bolsa:L.bolsa||"",m2:1,qty:qty||"0",desc,price});a++}
   });
   toast(a+" nuevos, "+u+" actualizados");
 }
@@ -291,14 +409,33 @@ $("#exp").onclick=async()=>{
   try{
     await loadXlsx();
     const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.pr.map(p=>({"Producto":p.name,"Código":p.code,"Descripción":p.desc||"","Bodega":whName(p.wh),"Ubicación":p.loc||"","Rack":p.rack||"","Nivel":p.nivel||"","Caja":p.caja||"","Cantidad":p.qty!==""&&!isNaN(p.qty)?Number(p.qty):p.qty,"Precio unitario":p.price&&!isNaN(p.price)?Number(p.price):(p.price||"")}))),"Productos");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.pr.map(p=>({"Producto":p.name,"Código":p.code,"Descripción":p.desc||"","Bodega":whName(p.wh),"Ubicación":p.loc||"","Rack":p.rack||"","Nivel":p.nivel||"","Caja":p.caja||"","Bolsa":p.bolsa||"","Cantidad":p.qty!==""&&!isNaN(p.qty)?Number(p.qty):p.qty,"Precio unitario":p.price&&!isNaN(p.price)?Number(p.price):(p.price||"")}))),"Productos");
     XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.wh.map(w=>({codigo:w.id,nombre:w.name}))),"Almacenes");
     XLSX.writeFile(wb,"ubicaciones_almacen.xlsx");toast("Excel exportado");
   }catch(e){toast("Sin internet: se exporta CSV");$("#expc").click()}
 };
+function xmlEsc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function xlsXml(rows){
+  const h=Object.keys(rows[0]);
+  const cell=v=>typeof v==="number"?`<Cell><Data ss:Type="Number">${v}</Data></Cell>`:`<Cell><Data ss:Type="String">${xmlEsc(v)}</Data></Cell>`;
+  return '<?xml version="1.0" encoding="UTF-8"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Productos"><Table><Row>'+h.map(cell).join("")+'</Row>'+rows.map(r=>'<Row>'+h.map(k=>cell(r[k])).join("")+'</Row>').join("")+'</Table></Worksheet></Workbook>';
+}
+$("#expx").onclick=async()=>{
+  if(!S.pr.length)return toast("No hay productos");
+  const rows=S.pr.map(p=>({"Producto":p.name,"Código":p.code,"Descripción":p.desc||"","Bodega":whName(p.wh),"Ubicación":p.loc||"","Rack":p.rack||"","Nivel":p.nivel||"","Caja":p.caja||"","Bolsa":p.bolsa||"","Cantidad":p.qty!==""&&!isNaN(p.qty)?Number(p.qty):p.qty,"Precio unitario":p.price&&!isNaN(p.price)?Number(p.price):(p.price||"")}));
+  try{
+    await loadXlsx();
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),"Productos");
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(S.wh.map(w=>({codigo:w.id,nombre:w.name}))),"Bodegas");
+    XLSX.writeFile(wb,"ubicaciones_almacen.xls",{bookType:"biff8"});toast("XLS exportado");
+  }catch(e){
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([xlsXml(rows)],{type:"application/vnd.ms-excel"}));a.download="ubicaciones_almacen.xls";a.click();toast("XLS exportado (modo sin internet)");
+  }
+};
 $("#expc").onclick=()=>{
   const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
-  const t=["Producto,Código,Descripción,Bodega,Ubicación,Rack,Nivel,Caja,Cantidad,Precio unitario"].concat(S.pr.map(p=>[p.name,p.code,p.desc||"",whName(p.wh),p.loc||"",p.rack||"",p.nivel||"",p.caja||"",p.qty,p.price||""].map(q).join(","))).join("\n");
+  const t=["Producto,Código,Descripción,Bodega,Ubicación,Rack,Nivel,Caja,Bolsa,Cantidad,Precio unitario"].concat(S.pr.map(p=>[p.name,p.code,p.desc||"",whName(p.wh),p.loc||"",p.rack||"",p.nivel||"",p.caja||"",p.bolsa||"",p.qty,p.price||""].map(q).join(","))).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv"}));a.download="productos.csv";a.click();
 };
 $("#demo").onclick=()=>{
@@ -308,15 +445,145 @@ $("#demo").onclick=()=>{
    {code:"P003",name:"Cable eléctrico 12 AWG",wh:"AL2",loc:"B-04-3",qty:"120"},
    {code:"P004",name:"Cinta aislante negra",wh:"AL2",loc:"",qty:"60"},
    {code:"P005",name:"Taladro inalámbrico",wh:"AL1",loc:"C-02-1",qty:"8"}]};
-  save();render();toast("Datos de ejemplo cargados");
+  S.m4=0;migrate3();render();toast("Datos de ejemplo cargados");
 };
 $("#clr").onclick=()=>{if(confirm("¿Borrar todos los almacenes y productos?")){S={wh:[],pr:[]};save();render()}};
 $("#thm").onclick=()=>{
   const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue("--bg").trim()==="#101315";
   d.dataset.theme=dark?"light":"dark";
 };
-migrate();render();
-if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
+function migrate3(){
+  fixCat();if(S.m4)return;S.m4=1;
+  Object.keys(S.cat).forEach(t=>{S.cat[t]=[...new Set(S.cat[t].map(up))].filter(Boolean)});
+  const map={};S.wh.forEach(w=>{const n=up(w.id);map[w.id]=n;w.id=n;w.name=up(w.name)});
+  S.pr.forEach(p=>{if(p.wh in map)p.wh=map[p.wh];["loc","rack","nivel","caja","bolsa"].forEach(t=>{p[t]=up(p[t])});["rack","nivel","caja"].forEach(t=>addCat(t,p[t]))});
+  save();
+}
+
+/* ---------- listas: agregar, editar, eliminar ---------- */
+let lsT=null,lsK=null;
+function openLs(t,k){lsT=t;lsK=k;$("#lsT").textContent=(k==null?"Agregar a ":"Editar en ")+TL[t];$("#lsV").value=k||"";$("#lsDel").style.display=k==null?"none":"block";$("#ls").classList.add("show");setTimeout(()=>$("#lsV").focus(),50)}
+$("#lists").onclick=e=>{
+  const a=e.target.closest("[data-a]");if(a)return openLs(a.dataset.a,null);
+  const it=e.target.closest(".item[data-t]");if(it)openLs(it.dataset.t,it.dataset.k);
+};
+$("#lsNo").onclick=()=>$("#ls").classList.remove("show");
+$("#lsOk").onclick=()=>{
+  const v=up($("#lsV").value),t=lsT,k=lsK;
+  if(!v)return toast("Escribe un valor");
+  if(v!==k&&items(t).some(x=>x.k===v))return toast("Ya existe");
+  if(k==null){t==="bodega"?S.wh.push({id:v,name:v}):S.cat[t].push(v)}
+  else if(v!==k){
+    if(t==="bodega"){const w=S.wh.find(x=>x.id===k);w.id=v;w.name=v;S.pr.forEach(p=>{if(p.wh===k)p.wh=v})}
+    else{S.cat[t]=S.cat[t].map(x=>x===k?v:x);S.pr.forEach(p=>{if(p[t]===k)p[t]=v})}
+  }
+  save();$("#ls").classList.remove("show");render();toast("Guardado");
+};
+$("#lsDel").onclick=()=>{
+  const t=lsT,k=lsK,n=count(t,k);
+  if(!confirm("¿Eliminar "+k+"?"+(n?" "+n+" producto(s) quedarán sin este dato.":"")))return;
+  if(t==="bodega"){S.wh=S.wh.filter(x=>x.id!==k);S.pr.forEach(p=>{if(p.wh===k)p.wh=""})}
+  else{S.cat[t]=S.cat[t].filter(x=>x!==k);S.pr.forEach(p=>{if(p[t]===k)p[t]=""})}
+  save();$("#ls").classList.remove("show");render();toast("Eliminado");
+};
+
+/* ---------- tamaño de letra ---------- */
+const FS=[22,26,30],FN=["Grande","Muy grande","Enorme"];let fi=0;
+try{fi=+localStorage.getItem("ubicador.fs")||0;if(fi<0||fi>2)fi=0}catch(e){}
+function applyFs(){document.documentElement.style.setProperty("--fs",FS[fi]+"px");$("#fsb").textContent="🔠 Tamaño de letra: "+FN[fi]}
+document.querySelectorAll(".fsb").forEach(b=>b.onclick=()=>{fi=(fi+1)%3;try{localStorage.setItem("ubicador.fs",fi)}catch(e){}applyFs();toast("Letra: "+FN[fi])});
+
+/* ---------- inicio de sesión ---------- */
+/* ---------- usuarios y sesión ---------- */
+const UK="ubicador.users";
+let U=[];
+try{U=JSON.parse(localStorage.getItem(UK)||"[]")}catch(e){}
+if(!Array.isArray(U)||!U.length)U=[{n:"Admin",p:"2020",a:1}];
+function saveU(){try{localStorage.setItem(UK,JSON.stringify(U))}catch(e){toast("No se pudo guardar")}}
+saveU();
+let me=null;
+try{const a=localStorage.getItem("ubicador.auth");me=U.find(u=>u.n===a)||(a==="1"?(U.find(u=>u.a)||U[0]):null)}catch(e){}
+if(me)$("#lock").style.display="none";
+function curU(){return U.find(u=>u.n===$("#lu").value)||U[0]}
+function fillLu(){
+  let prev=$("#lu").value;
+  if(!prev){try{prev=localStorage.getItem("ubicador.last")}catch(e){}}
+  $("#lu").innerHTML=U.map(u=>`<option>${esc(u.n)}</option>`).join("");
+  if(U.some(u=>u.n===prev))$("#lu").value=prev;
+  $("#lu").style.display=U.length>1?"block":"none";
+  buildDots();
+}
+function buildDots(){$("#dots").innerHTML="<i></i>".repeat(curU().p.length);dots()}
+function dots(){document.querySelectorAll("#dots i").forEach((d,i)=>d.classList.toggle("on",i<$("#pw").value.length))}
+$("#lu").onchange=()=>{$("#pw").value="";$("#pwE").textContent="";buildDots()};
+function tryPw(){
+  const c=$(".lk-card");if(c.classList.contains("ok")||c.classList.contains("bad"))return;
+  const u=curU();
+  if($("#pw").value===u.p){
+    me=u;
+    try{localStorage.setItem("ubicador.last",u.n);if($("#rem").checked)localStorage.setItem("ubicador.auth",u.n);else localStorage.removeItem("ubicador.auth")}catch(e){}
+    $("#pwE").textContent="";c.classList.add("ok");
+    setTimeout(()=>{$("#lock").style.display="none";c.classList.remove("ok");$("#pw").value="";dots();renderUsers()},1550);
+  }else{
+    $("#pwE").textContent="Contraseña incorrecta";c.classList.add("bad");
+    setTimeout(()=>{c.classList.remove("bad");$("#pw").value="";dots()},1100);
+  }
+}
+function pad(n){
+  const c=$(".lk-card");if(c.classList.contains("ok")||c.classList.contains("bad"))return;
+  const pw=$("#pw");$("#pwE").textContent="";
+  if(n==="x")pw.value=pw.value.slice(0,-1);
+  else if(n==="ok")return tryPw();
+  else if(pw.value.length<8)pw.value+=n;
+  dots();
+  if(n!=="x"&&pw.value.length===curU().p.length)setTimeout(tryPw,450);
+}
+document.querySelectorAll(".pad button").forEach(b=>b.onclick=()=>{b.classList.remove("rp");void b.offsetWidth;b.classList.add("rp");pad(b.dataset.n)});
+document.addEventListener("keydown",e=>{if($("#lock").style.display==="none")return;if(/^\d$/.test(e.key))pad(e.key);else if(e.key==="Backspace")pad("x");else if(e.key==="Enter")pad("ok")});
+const lockNow=()=>{me=null;try{localStorage.removeItem("ubicador.auth")}catch(e){}$("#pw").value="";$("#pwE").textContent="";fillLu();$("#lock").style.display="flex"};
+$("#out").onclick=lockNow;$("#lk").onclick=lockNow;
+
+/* ---------- gestión de usuarios ---------- */
+function renderUsers(){
+  if(!me){$("#ulist").innerHTML="";return}
+  const list=me.a?U:[me];
+  $("#ulist").innerHTML=`<div class="card"><h2>Sesión: ${esc(me.n)}${me.a?" (administrador)":""}</h2>`+(me.a?'<button class="btn" id="uadd">＋ Agregar usuario</button>':"")+list.map(u=>`<div class="item" data-u="${esc(u.n)}"><div class="t"><b>${esc(u.n)}</b><small>${u.a?"Administrador":"Usuario"}</small></div><div class="loc">Editar</div></div>`).join("")+`</div>`;
+}
+let usK=null;
+function openUs(k){
+  usK=k;const u=k==null?null:U.find(x=>x.n===k);
+  $("#usT").textContent=u?"Editar usuario":"Nuevo usuario";
+  $("#usN").value=u?u.n:"";$("#usP").value=u?u.p:"";$("#usA").checked=u?!!u.a:false;
+  $("#usN").disabled=!!u&&!me.a;
+  $("#usAL").style.display=me.a?"flex":"none";
+  $("#usDel").style.display=u&&me.a&&u.n!==me.n?"block":"none";
+  $("#us").classList.add("show");
+}
+$("#ulist").onclick=e=>{
+  if(e.target.closest("#uadd"))return openUs(null);
+  const it=e.target.closest(".item[data-u]");if(it)openUs(it.dataset.u);
+};
+$("#usNo").onclick=()=>$("#us").classList.remove("show");
+$("#usOk").onclick=()=>{
+  const old=usK==null?null:U.find(x=>x.n===usK);
+  const n=old&&!me.a?old.n:up($("#usN").value),pw=$("#usP").value.trim(),adm=me.a?$("#usA").checked:(old?!!old.a:false);
+  if(!n)return toast("Escribe el usuario");
+  if(!/^\d{4,8}$/.test(pw))return toast("Contraseña: de 4 a 8 números");
+  if(U.some(x=>x!==old&&x.n.toLowerCase()===n.toLowerCase()))return toast("Ese usuario ya existe");
+  if(old&&old.a&&!adm&&U.filter(x=>x.a).length<2)return toast("Debe haber al menos un administrador");
+  if(old){
+    const was=old.n;old.n=n;old.p=pw;old.a=adm?1:0;
+    try{if(localStorage.getItem("ubicador.auth")===was)localStorage.setItem("ubicador.auth",n)}catch(e){}
+  }else U.push({n,p:pw,a:adm?1:0});
+  saveU();$("#us").classList.remove("show");fillLu();render();toast("Guardado");
+};
+$("#usDel").onclick=()=>{
+  const u=U.find(x=>x.n===usK);if(!u||u.n===me.n)return;
+  if(!confirm("¿Eliminar al usuario "+u.n+"?"))return;
+  U=U.filter(x=>x!==u);saveU();$("#us").classList.remove("show");fillLu();render();toast("Eliminado");
+};
+
+migrate();migrate3();applyFs();fillLu();render();
 </script>
 </body>
 </html>
